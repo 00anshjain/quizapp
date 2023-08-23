@@ -26,13 +26,13 @@ public class QuizService {
     @Autowired
     QuestionDao questionDao;
     public ResponseEntity<String> createQuiz(String category, int numQ, String title) {
+        if (numQ == 0) {
+            throw new InvalidQuizException("1007", "Quiz cannot have no questions");
+        }
+        if (title.isEmpty()) {
+            throw new InvalidQuizException("1008", "No title found for quiz creation");
+        }
         try {
-            if (numQ == 0) {
-                throw new InvalidQuizException("1007", "Quiz cannot have no questions");
-            }
-            if (title.isEmpty()) {
-                throw new InvalidQuizException("1008", "No title found for quiz creation");
-            }
             List<Question> questions = questionDao.findRandomQuestionsByCategory(category, numQ);
             Quiz quiz = new Quiz();
             quiz.setTitle(title);
@@ -46,27 +46,21 @@ public class QuizService {
         catch (Exception e) {
             throw new InvalidQuizException("1010", "Exception while creating quiz " + e.getMessage());
         }
-
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
     }
 
     public ResponseEntity<List<QuestionWrapper>> getQuizQuestions(Integer id) {
         List<QuestionWrapper> questionsForUser = new ArrayList<>();
-        try {
-            Optional<Quiz> quiz = quizDao.findById(id);
-            // Optional because data might come, might not come, if the quizId is present then only data will come
-            // So to avoid getting NULL Value Exception we use Optional here
-            if (quiz.isEmpty()) {
-                throw new InvalidQuizException("1011", "No quiz found for quiz_id = " + id);
-            }
-            List<Question> questionsFromDB = quiz.get().getQuestions();
-            for (Question q : questionsFromDB) {
-                QuestionWrapper qw = new QuestionWrapper(q.getId(), q.getQuestionTitle(), q.getOption1(), q.getOption2(), q.getOption3(), q.getOption4());
-                questionsForUser.add(qw);
-            }
+        Optional<Quiz> quiz = quizDao.findById(id);
+        // Optional because data might come, might not come, if the quizId is present then only data will come
+        // So to avoid getting NULL Value Exception we use Optional here
+        if (quiz.isEmpty()) {
+            throw new InvalidQuizException("1011", "No quiz found for quiz_id = " + id);
         }
-        catch (Exception e) {
-            throw new InvalidQuizException("1011", "Exception fetching quiz for quiz_id = " + id);
+        List<Question> questionsFromDB = quiz.get().getQuestions();
+        for (Question q : questionsFromDB) {
+            QuestionWrapper qw = new QuestionWrapper(q.getId(), q.getQuestionTitle(), q.getOption1(), q.getOption2(), q.getOption3(), q.getOption4());
+            questionsForUser.add(qw);
         }
         return new ResponseEntity<>(questionsForUser, HttpStatus.OK);
     }
@@ -82,12 +76,15 @@ public class QuizService {
                 if(resp.isEmpty()) {
                     throw new QuizSubmissionException("1013", "No response submitted for a question");
                 }
-
                 if (resp.equals(questions.get(i).getRightAnswer()))
                     right++;
                 i++;
             }
             return new ResponseEntity<>(right, HttpStatus.OK);
+        }
+        catch (QuizSubmissionException e)
+        {
+            throw new QuizSubmissionException("1013", "No response submitted for a question");
         }
         catch(Exception e) {
             throw new QuizSubmissionException("1012", "Error while submitting quiz " + e.getMessage());

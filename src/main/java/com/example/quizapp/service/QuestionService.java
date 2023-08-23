@@ -17,45 +17,35 @@ public class QuestionService {
     @Autowired
     QuestionDao questionDao;
     public ResponseEntity<List<Question>> getAllQuestions() {
-        try {
-            List<Question> questions = questionDao.findAll();
-            if(questions.isEmpty()) {
-                throw new InvalidQuizException("1003", "No question found while fetching all questions");
-            }
-            return new ResponseEntity<>(questions, HttpStatus.OK);
-        }catch (Exception e) {
-            throw new InvalidQuizException("1004", "Something went wrong in Question service layer while fetching all questions"  + e.getMessage());
+        List<Question> questions = questionDao.findAll();
+        if(questions.isEmpty()) {
+            throw new InvalidQuizException("1003", "No question found while fetching all questions");
         }
+        return new ResponseEntity<>(questions, HttpStatus.OK);
     }
 
     public ResponseEntity<List<Question>> getQuestionsByCategory(String category) {
-        try {
-            List<Question> questions = questionDao.findByCategory(category);
-            if(questions.isEmpty()) {
-                throw new InvalidQuizException("1003", "No question found for category="+ category);
-            }
-            return new ResponseEntity<>(questions, HttpStatus.OK);
-        }catch (Exception e) {
-            throw new InvalidQuizException("1004", "Something went wrong in Question service layer while fetching for category " + e.getMessage());
+        List<Question> questions = questionDao.findByCategory(category);
+        if(questions.isEmpty()) {
+            throw new InvalidQuizException("1003", "No question found for category="+ category);
         }
-//        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(questions, HttpStatus.OK);
     }
 
 
     public ResponseEntity<String> addQuestion(Question question) {
+        if (question.getQuestionTitle().isEmpty() || question.getOption1().isEmpty() ||
+                question.getOption2().isEmpty() || question.getRightAnswer().isEmpty())
+            throw new InvalidQuestionException("1001", "Question don't have all required fields");
         try {
-            if (question.getQuestionTitle().isEmpty() || question.getOption1().isEmpty() ||
-                    question.getOption2().isEmpty() || question.getRightAnswer().isEmpty())
-                throw new InvalidQuestionException("1001", "Question don't have all required fields");
             questionDao.save(question);
-            return new ResponseEntity<>("success", HttpStatus.CREATED);
-        }
-        catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e){
                 throw new InvalidQuizException("1002", "Question cannot be added " + e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new InvalidQuizException("1002", "Something went wrong in Question service layer while saving question" + e.getMessage());
         }
+        return new ResponseEntity<>("success", HttpStatus.CREATED);
+
     }
 
 }
