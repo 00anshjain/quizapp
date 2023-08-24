@@ -20,47 +20,16 @@ public class QuestionController {
 
     @GetMapping("allQuestions")
     public ResponseEntity<?> getAllQuestions() {
-        try {
             return questionService.getAllQuestions();
-        }
-        catch (InvalidQuizException e){
-            ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            ControllerException ce = new ControllerException("1014","Exception");
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
     }
 
     @GetMapping("category/{category}")
     public ResponseEntity<?> getQuestionsByCategory(@PathVariable String category) {
-        try {
             return questionService.getQuestionsByCategory(category);
-        }
-        catch (InvalidQuizException e){
-            ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            ControllerException ce = new ControllerException("1014","Exception");
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
     }
 
     @PostMapping("add")
     public ResponseEntity<?> addQuestion(@RequestBody Question question) {
-        try
-        {
             return questionService.addQuestion(question);
-        }
-        catch (InvalidQuizException e){
-            ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            ControllerException ce = new ControllerException("1014","Exception");
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
     }
 }

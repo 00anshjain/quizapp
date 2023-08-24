@@ -25,44 +25,15 @@ public class QuizController {
 
     @RequestMapping("create")
     public ResponseEntity<?> createQuiz(@RequestParam String category, @RequestParam int numQ, @RequestParam String title) {
-        try{
             return quizService.createQuiz(category, numQ, title);
-        }
-        catch (InvalidQuizException e) {
-            ControllerException ce = new ControllerException(e.getErrorCode(),e.getErrorMessage());
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            ControllerException ce = new ControllerException("1014","Exception");
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
     }
 
     @GetMapping("get/{id}")
     public ResponseEntity<?> getQuizQuestions(@PathVariable Integer id) {
-        try {
             return quizService.getQuizQuestions(id);
-        }
-        catch (InvalidQuizException e){
-            ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            ControllerException ce = new ControllerException("1014","Exception");
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
     }
     @PostMapping("submit/{id}")
     public ResponseEntity<?> submitQuiz(@PathVariable Integer id, @RequestBody List<Response> responses) {
-        try{
             return quizService.calculateResult(id, responses);
-    } catch (QuizSubmissionException e){
-            ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            ControllerException ce = new ControllerException("1014","Exception");
-            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-        }
     }
 }
