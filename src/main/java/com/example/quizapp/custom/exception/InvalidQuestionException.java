@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class InvalidQuestionException extends RuntimeException{
 
     private static final long serialVersionUID = 1L;
+    @Getter
     private String errorCode;
     private String errorMessage;
 
@@ -22,4 +23,5 @@ public class InvalidQuestionException extends RuntimeException{
     public InvalidQuestionException() {
 
     }
+
 }

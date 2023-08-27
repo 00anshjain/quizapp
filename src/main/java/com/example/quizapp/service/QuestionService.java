@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class QuestionService {
@@ -34,8 +35,11 @@ public class QuestionService {
 
 
     public ResponseEntity<String> addQuestion(Question question) {
-        if (question.getQuestionTitle().isEmpty() || question.getOption1().isEmpty() ||
-                question.getOption2().isEmpty() || question.getRightAnswer().isEmpty())
+//        System.out.println(question);
+        if (question.getQuestionTitle() == null || question.getQuestionTitle().isEmpty() ||
+                question.getOption1() == null || question.getOption1().isEmpty() ||
+                question.getOption2() == null || question.getOption2().isEmpty() ||
+                question.getRightAnswer() == null || question.getRightAnswer().isEmpty())
             throw new InvalidQuestionException("1001", "Question don't have all required fields");
         try {
             questionDao.save(question);
